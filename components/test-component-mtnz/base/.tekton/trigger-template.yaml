@@ -1,0 +1,57 @@
+apiVersion: triggers.tekton.dev/v1beta1
+kind: TriggerTemplate
+metadata:
+  creationTimestamp: null
+  name: test-component-mtnz
+  namespace: hacbs-e2e-uraz
+spec:
+  params:
+  - name: git-revision
+  resourcetemplates:
+  - apiVersion: tekton.dev/v1beta1
+    kind: PipelineRun
+    metadata:
+      annotations:
+        appstudio.openshift.io/application: hacbs-demo-test-app-flze
+        appstudio.openshift.io/component: test-component-mtnz
+        build.appstudio.openshift.io/build: "true"
+        build.appstudio.openshift.io/type: build
+        build.appstudio.openshift.io/version: "0.1"
+        pipelines.appstudio.openshift.io/type: build
+      creationTimestamp: null
+      generateName: test-component-mtnz-
+      labels:
+        appstudio.openshift.io/application: hacbs-demo-test-app-flze
+        appstudio.openshift.io/component: test-component-mtnz
+        build.appstudio.openshift.io/build: "true"
+        build.appstudio.openshift.io/type: build
+        build.appstudio.openshift.io/version: "0.1"
+        pipelines.appstudio.openshift.io/type: build
+      namespace: hacbs-e2e-uraz
+    spec:
+      params:
+      - name: git-url
+        value: https://github.com/psturc-org/devfile-sample-hello-world
+      - name: output-image
+        value: quay.io/psturc/test-images:507fbfae4de8492484b602755b82de24-$(tt.params.git-revision)
+      - name: dockerfile
+        value: docker/Dockerfile
+      - name: path-context
+        value: .
+      pipelineRef:
+        bundle: quay.io/redhat-appstudio-tekton-catalog/pipeline-docker-build:9212817dcd58ed82930ffb0156706377d8422286
+        name: docker-build
+      workspaces:
+      - name: workspace
+        volumeClaimTemplate:
+          metadata:
+            creationTimestamp: null
+          spec:
+            accessModes:
+            - ReadWriteOnce
+            resources:
+              requests:
+                storage: 1Gi
+          status: {}
+    status: {}
+status: {}
